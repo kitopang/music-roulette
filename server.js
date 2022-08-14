@@ -21,11 +21,20 @@ app.set('views', path.join(__dirname, '/views'));
 
 io.on('connection', socket => {
     console.log("New connection...");
-})
 
-// app.get('/', (req, res) => {
-//     res.render('home_page.ejs')
-// })
+    socket.emit('message', 'Connected to music-roulette');
+
+    socket.broadcast.emit('message', 'User has joined the lobby');
+
+    socket.on('disconnect', () => {
+        io.emit('message', 'User has left the lobby');
+    });
+
+    //Listen for start command
+    socket.on('startgame', (start) => {
+        console.log(start);
+    })
+})
 
 
 var SpotifyWebApi = require('spotify-web-api-node');
@@ -75,6 +84,8 @@ app.get('/callback', (req, res) => {
         return;
     }
 
+    //res.render('home_page.ejs')
+
     spotifyApi
         .authorizationCodeGrant(code)
         .then(data => {
@@ -91,7 +102,8 @@ app.get('/callback', (req, res) => {
             console.log(
                 `Sucessfully retreived access token. Expires in ${expires_in} s.`
             );
-            res.send('Success! You can now close the window.');
+            res.render('home_page.ejs')
+
 
             setInterval(async () => {
                 const data = await spotifyApi.refreshAccessToken();
@@ -106,8 +118,10 @@ app.get('/callback', (req, res) => {
             console.error('Error getting Tokens:', error);
             res.send(`Error getting Tokens: ${error}`);
         });
+
 });
 
-server.listen(PORT, () => {
+
+server.listen(PORT, '0.0.0.0', () => {
     console.log("Open on port: " + PORT)
 })
