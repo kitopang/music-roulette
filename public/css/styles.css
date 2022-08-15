@@ -1,0 +1,14 @@
+#lobby {
+    opacity: 100;
+    transition: opacity .5s;
+}
+
+#round_number {
+    opacity: 0;
+    transition: .5s;
+}
+
+#round {
+    opacity: 100;
+    transition: opacity .5s;
+}

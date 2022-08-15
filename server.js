@@ -10,17 +10,26 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server)
 
-const PORT = process.env.PORT || 3000;
-
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'views')));
+const { player_join, get_player } = require('./public/js/players');
+const { add_spotify } = require('./public/js/spotify');
+
+const PORT = process.env.PORT || 3000;
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 
 io.on('connection', socket => {
-    console.log("New connection...");
+    var socketId = socket.id;
+    var clientIp = socket.request.connection.remoteAddress;
+
+    socket.on('join_lobby', (code) => {
+        const player = player_join('kitop40',)
+    })
+
+    console.log(clientIp);
 
     socket.emit('message', 'Connected to music-roulette');
 
@@ -32,7 +41,7 @@ io.on('connection', socket => {
 
     //Listen for start command
     socket.on('startgame', (start) => {
-        console.log(start);
+        io.emit('startgame', start)
     })
 })
 
@@ -77,6 +86,8 @@ app.get('/callback', (req, res) => {
     const error = req.query.error;
     const code = req.query.code;
     const state = req.query.state;
+    const ip = req.socket.remoteAddress;
+    console.log('added ip ' + ip)
 
     if (error) {
         console.error('Callback Error:', error);
@@ -102,6 +113,8 @@ app.get('/callback', (req, res) => {
             console.log(
                 `Sucessfully retreived access token. Expires in ${expires_in} s.`
             );
+
+            add_spotify(access_token, ip)
             res.render('home_page.ejs')
 
 
