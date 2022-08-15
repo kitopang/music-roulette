@@ -13,8 +13,8 @@ const io = socketio(server)
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'views')));
-const { player_join, get_player } = require('./public/js/players');
-const { add_spotify } = require('./public/js/spotify');
+const { player_join, player_leave, populate_lobby, get_player } = require('./public/js/players');
+const { add_spotify, get_spotify } = require('./public/js/spotify');
 
 const PORT = process.env.PORT || 3000;
 
@@ -25,15 +25,33 @@ io.on('connection', socket => {
     var socketId = socket.id;
     var clientIp = socket.request.connection.remoteAddress;
 
+
+    console.log("connected!");
+
+
     socket.on('join_lobby', (code) => {
-        const player = player_join('kitop40',)
+        const spotify_item = get_spotify(clientIp);
+        const player = player_join(socket.id, spotify_item.username, code, spotify_item.topTracks);
+
+        socket.join(player.code)
+        console.log(player.username);
+
+
+        socket.broadcast.to(player.code).emit('message', spotify_item.username + ' has joined the lobby');
+        socket.broadcast.to(player.code).emit('join_lobby', player);
     })
 
-    console.log(clientIp);
+    socket.on('initialize_lobby', (code) => {
+        socket.emit('initialize_lobby', populate_lobby(code))
+    })
 
-    socket.emit('message', 'Connected to music-roulette');
+    socket.on('get_self', (code) => {
+        socket.emit('get_self', get_player(socket.id));
+    })
 
-    socket.broadcast.emit('message', 'User has joined the lobby');
+    // socket.on('play_game' () => {
+
+    // })
 
     socket.on('disconnect', () => {
         io.emit('message', 'User has left the lobby');
@@ -75,7 +93,7 @@ const scopes = [
 var spotifyApi = new SpotifyWebApi({
     clientId: '618a3849a7234a949622b2722ba8bfdb',
     clientSecret: '4037f89d0c0f464fa173e62f9fa247fa',
-    redirectUri: 'http://localhost:3000/callback'
+    redirectUri: 'http://192.168.1.202:3000/callback'
 });
 
 app.get('/spotifylogin', (req, res) => {

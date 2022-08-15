@@ -15,19 +15,20 @@ function add_spotify(access_token, ip_address) {
                 .then(function (data) {
                     console.log('Some information about the authenticated user', data.body);
                     spotify_item = { username: data.body.id, topTracks, ip_address }
-                    console.log(spotify_item);
                     spotify_data.push(spotify_item);
                 }, function (err) {
                     console.log('Something went wrong!', err);
                 });
-
-
-
         }, function (err) {
             console.log('Something went wrong!', err);
         });
 }
 
+function get_spotify(ip_address) {
+    return spotify_data.find(spotify_item => spotify_item.ip_address === ip_address);
+}
+
 module.exports = {
-    add_spotify
+    add_spotify,
+    get_spotify
 };

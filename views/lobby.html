@@ -16,21 +16,15 @@
 <body>
     <div class="container-fluid min-vh-100" style="background-color: #252525;">
         <h1 class="display-5 text-light mb-1 pt-5 px-5">musicRoulette.io</h1>
-        <h1 class="display-5 text-light mb-5 px-5">Lobby: 1531 </h1>
+        <h1 class="display-5 text-light mb-5 px-5" id="lobby_number">Lobby: null</h1>
 
-        <div class="d-none" id="lobby">
+        <div class="d" id="lobby">
             <div class="justify-content-center mx-auto align-items-center d-flex">
-                <ul class="list-group list-group-flush bg-transparent col-7">
+                <ul class="list-group list-group-flush bg-transparent col-7" id="joined_players_list">
                     <li class="text-center list-group-item bg-dark border border-light text-light rounded-top">---
                         Joined
                         Players ---
                     </li>
-                    <li class="list-group-item bg-transparent border border-light text-light">An item</li>
-                    <li class="list-group-item bg-transparent border border-light text-light">An item</li>
-                    <li class="list-group-item bg-transparent border border-light text-light">An item</li>
-                    <li class="list-group-item bg-transparent border border-light text-light">An item</li>
-                    <li class="list-group-item bg-transparent border border-light text-light">An item</li>
-                    <li class="list-group-item bg-transparent border border-light text-light">An item</li>
                 </ul>
             </div>
             <div class="justify-content-end d-flex col-9">
@@ -42,7 +36,7 @@
             <h1 class="display-5 text-light mt-5 pt-5 px-5">Round 1/15</h1>
         </div>
 
-        <div class="d-flex justify-content-center align-items-center d-" id="round">
+        <div class="d-flex justify-content-center align-items-center d-none" id="round">
             <div class="bg-transparent border border-light col-6 rounded">
                 <h1 class="display-5 text-light mb-1 pt-5 px-5">Round</h1>
             </div>
