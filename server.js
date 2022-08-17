@@ -33,12 +33,12 @@ io.on('connection', socket => {
         const spotify_item = get_spotify(clientIp);
         const player = player_join(socket.id, spotify_item.username, code, spotify_item.topTracks);
 
-        socket.join(player.code)
+        socket.join(player.lobby_code)
         console.log(player.username);
 
 
-        socket.broadcast.to(player.code).emit('message', spotify_item.username + ' has joined the lobby');
-        socket.broadcast.to(player.code).emit('join_lobby', player);
+        socket.broadcast.to(player.lobby_code).emit('message', spotify_item.username + ' has joined the lobby');
+        socket.broadcast.to(player.lobby_code).emit('join_lobby', player);
     })
 
     socket.on('initialize_lobby', (code) => {
@@ -54,7 +54,9 @@ io.on('connection', socket => {
     // })
 
     socket.on('disconnect', () => {
-        io.emit('message', 'User has left the lobby');
+        io.emit('disconnect_player', get_player(socket.id));
+        socket.leave(get_player(socket.id).lobby_code);
+        player_leave(socket.id);
     });
 
     //Listen for start command

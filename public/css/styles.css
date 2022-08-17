@@ -12,3 +12,12 @@
     opacity: 100;
     transition: opacity .5s;
 }
+
+#create_game_input {
+    opacity: 0;
+}
+
+#create_game:hover {
+    transition: background-color .5s;
+    background-color: gray !important;
+}

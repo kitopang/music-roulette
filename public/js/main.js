@@ -18,6 +18,9 @@ socket.on('message', message => {
     console.log(message);
 })
 
+socket.on('disconnect_player', player => {
+    remove_player_from_lobby(player);
+})
 
 socket.emit('join_lobby', lobby.code);
 
@@ -28,7 +31,6 @@ socket.on('join_lobby', player => {
 socket.emit('initialize_lobby', lobby.code)
 
 socket.on('initialize_lobby', players => {
-
     for (player of players) {
         add_player_to_lobby(player);
     }
@@ -63,6 +65,16 @@ function add_player_to_lobby(player) {
     entry.innerText = player.username;
 
     joined_players_div.appendChild(entry);
+}
+
+function remove_player_from_lobby(player) {
+    const player_elements = joined_players_div.children;
+
+    for (let i = 0; i < player_elements.length; i++) {
+        if (player_elements[i].innerText === player.username) {
+            player_elements[i].remove();
+        }
+    }
 }
 
 function render_next_round() {
