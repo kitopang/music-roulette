@@ -4,6 +4,8 @@ const round_number_div = document.querySelector('#round_number');
 const round_div = document.querySelector('#round');
 const joined_players_div = document.querySelector('#joined_players_list');
 const lobby_number = document.querySelector('#lobby_number');
+const player_choices_div = document.querySelector('#player_choices');
+
 
 const lobby = Qs.parse(location.search, {
     ignoreQueryPrefix: true
@@ -43,12 +45,12 @@ socket.on('initialize_lobby', players => {
 // })
 
 socket.on('startgame', start => {
-    if (start === 'false') {
+    if (start === 'true') {
         lobby_div.style.opacity = '0';
 
         setTimeout(function () {
             lobby_div.classList.add('d-none');
-            render_next_round();
+            play_game();
         }, 500);
     }
 
@@ -77,6 +79,18 @@ function remove_player_from_lobby(player) {
     }
 }
 
+function play_game() {
+    const total_rounds = 16;
+    const time_per_round = 30;
+    render_next_round();
+
+    for (let round = 1; round < total_rounds; round++) {
+        for (let seconds = 0; seconds < time_per_round; seconds++) {
+
+        }
+    }
+}
+
 function render_next_round() {
     round_number_div.classList.remove('d-none');
 
@@ -91,6 +105,7 @@ function render_next_round() {
                 round_div.classList.remove('d-none');
 
                 setTimeout(function () {
+                    populate_player_cards();
                     round_div.style.opacity = '100';
                 }, 500)
             }, 500)
@@ -98,16 +113,59 @@ function render_next_round() {
     }, 500);
 }
 
+function populate_player_cards() {
+
+    socket.emit('get_players', lobby.code);
+
+    socket.on('get_players', current_players => {
+        let current_row;
+        index = 0;
+        for (let i = 0; i < current_players.length; i++) {
+            let player = current_players[i];
+
+            if ((index % 2) === 0) {
+                current_row = document.createElement("div");
+                current_row.classList.add('row', 'mt-3');
+
+                let entry = document.createElement("div");
+                entry.classList.add('bg-transparent', 'border', 'border-light', 'col', 'p-4', 'mx-4', 'text-center')
+                let text = document.createElement("h2");
+                text.innerText = player.username;
+                text.classList.add('text-light');
+
+                player_choices_div.append(current_row);
+                current_row.append(entry);
+                entry.append(text);
+            } else {
+                let entry = document.createElement("div");
+                entry.classList.add('bg-transparent', 'border', 'border-light', 'col', 'p-4', 'mx-4', 'text-center')
+                let text = document.createElement("h2");
+                text.innerText = player.username;
+                text.classList.add('text-light');
+
+                current_row.append(entry);
+                entry.append(text);
+            }
+
+            index++;
+        }
+    })
+
+}
+
+
+
+
 start_game_button.addEventListener("click", () => {
     socket.emit('startgame', 'true');
     console.log("emits")
 });
 
-const myAudio = document.createElement('audio');
+// const myAudio = document.createElement('audio');
 
-if (myAudio.canPlayType('audio/mpeg')) {
-    myAudio.setAttribute('src', 'https://p.scdn.co/mp3-preview/022b6aef48436fa9ffdebf761bde4a719d686dc3?cid=618a3849a7234a949622b2722ba8bfdb');
-}
+// if (myAudio.canPlayType('audio/mpeg')) {
+//     myAudio.setAttribute('src', 'https://p.scdn.co/mp3-preview/022b6aef48436fa9ffdebf761bde4a719d686dc3?cid=618a3849a7234a949622b2722ba8bfdb');
+// }
 
-myAudio.play();
+// myAudio.play();
 

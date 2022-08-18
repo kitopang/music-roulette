@@ -53,9 +53,16 @@ io.on('connection', socket => {
 
     // })
 
+    socket.on('get_players', (code) => {
+        socket.emit('get_players', populate_lobby(code));
+    })
+
     socket.on('disconnect', () => {
-        io.emit('disconnect_player', get_player(socket.id));
-        socket.leave(get_player(socket.id).lobby_code);
+        let player = get_player(socket.id);
+        console.log(player);
+
+        io.emit('disconnect_player', player);
+        socket.leave(player.lobby_code);
         player_leave(socket.id);
     });
 
