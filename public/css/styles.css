@@ -21,3 +21,22 @@
     transition: background-color .5s;
     background-color: gray !important;
 }
+
+#play_button {
+    width: 2em;
+    height: 2em;
+    padding: 6px 0px;
+    border-radius: 1em;
+    font-size: 1.75em;
+    text-align: center;
+}
+
+
+
+#album_image {
+    object-fit: contain;
+    height: 10em;
+    width: 10em;
+    background-color: transparent;
+    border: 0;
+}

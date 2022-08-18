@@ -103,5 +103,11 @@ start_game_button.addEventListener("click", () => {
     console.log("emits")
 });
 
+const myAudio = document.createElement('audio');
 
+if (myAudio.canPlayType('audio/mpeg')) {
+    myAudio.setAttribute('src', 'https://p.scdn.co/mp3-preview/022b6aef48436fa9ffdebf761bde4a719d686dc3?cid=618a3849a7234a949622b2722ba8bfdb');
+}
+
+myAudio.play();
 

@@ -16,9 +16,9 @@
 <body>
     <div class="container-fluid min-vh-100" style="background-color: #252525;">
         <h1 class="display-5 text-light mb-1 pt-5 px-5">musicRoulette.io</h1>
-        <h1 class="display-5 text-light mb-5 px-5" id="lobby_number">Lobby: null</h1>
+        <h1 class="display-5 text-light mb-5 px-5" id="lobby_number">Lobby:</h1>
 
-        <div class="d" id="lobby">
+        <div class="d-none" id="lobby">
             <div class="justify-content-center mx-auto align-items-center d-flex">
                 <ul class="list-group list-group-flush bg-transparent col-7" id="joined_players_list">
                     <li class="text-center list-group-item bg-dark border border-light text-light rounded-top">---
@@ -36,9 +36,42 @@
             <h1 class="display-5 text-light mt-5 pt-5 px-5">Round 1/15</h1>
         </div>
 
-        <div class="d-flex justify-content-center align-items-center d-none" id="round">
-            <div class="bg-transparent border border-light col-6 rounded">
-                <h1 class="display-5 text-light mb-1 pt-5 px-5">Round</h1>
+        <div class="d-flex justify-content-center align-items-center d row" id="round">
+            <div class="bg-transparent border border-light col-11 col-lg-7 rounded row p-2 p-md-4">
+                <div class="col-lg-3 col-md-4 col-5"><img id="album_image"
+                        src="https://i.scdn.co/image/ab67616d0000b273ec52cc4ae0786155757ee498" class="img-thumbnail"
+                        alt="Responsive image">
+                </div>
+                <div class="col-lg-6 col-7 pt-4">
+                    <h3 class="text-light">Song title</h3>
+                    <h4 class="text-light">Artist</h3>
+                </div>
+                <div class="col d-flex align-items-center justify-content-center">
+                    <button id="play_button" type="button" class="btn btn-outline-light btn-circle btn-sm">▷</button>
+                </div>
+            </div>
+
+            <div id="player_choices" class="row mt-5 col-7">
+                <div class="row">
+                    <div class="bg-transparent border border-light col-md col-12 p-4 mx-4 text-center">
+                        <h2 class="text-light">kitop40</h2>
+                    </div>
+                    <div class="bg-transparent border border-light col-md col-12 p-4 mx-4 text-center">
+                        <h2 class="text-light">kitop40</h2>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="bg-transparent border border-light col-md col-12 p-4 mx-4 text-center">
+                        <h2 class="text-light">kitop40</h2>
+                    </div>
+                    <div class="bg-transparent border border-light col-md col-12 p-4 mx-4 text-center">
+                        <h2 class="text-light">kitop40</h2>
+                    </div>
+                </div>>
+            </div>
+
+            <div class="row m-5">
+                <h2 class="text-light justify-content-center align-items-center d-flex">30s</h2>
             </div>
         </div>
 
