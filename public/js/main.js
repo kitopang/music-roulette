@@ -5,6 +5,9 @@ const round_div = document.querySelector('#round');
 const joined_players_div = document.querySelector('#joined_players_list');
 const lobby_number = document.querySelector('#lobby_number');
 const player_choices_div = document.querySelector('#player_choices');
+const album_image = document.querySelector('#album_image');
+const song_title = document.querySelector('#song_title');
+const song_artist = document.querySelector('#song_artist');
 
 
 const lobby = Qs.parse(location.search, {
@@ -50,7 +53,7 @@ socket.on('startgame', start => {
 
         setTimeout(function () {
             lobby_div.classList.add('d-none');
-            play_game();
+            initialize_game();
         }, 500);
     }
 
@@ -79,20 +82,47 @@ function remove_player_from_lobby(player) {
     }
 }
 
-function play_game() {
+function initialize_game() {
     const total_rounds = 16;
     const time_per_round = 30;
-    render_next_round();
 
-    for (let round = 1; round < total_rounds; round++) {
-        for (let seconds = 0; seconds < time_per_round; seconds++) {
 
-        }
+    play_game(0, total_rounds);
+}
+
+function play_game(round_number, total_rounds) {
+    let player_cards;
+    let seconds = 0;
+
+    if (round_number === total_rounds) {
+        return;
     }
+
+    if (round_number === 0) {
+        player_cards = render_next_round();
+    } else {
+        show_leaderboard();
+        player_cards = render_next_round();
+    }
+
+    const interval = setInterval(function () {
+        console.log(seconds);
+        seconds++;
+        if (seconds === 30) {
+            clearInterval(interval);
+            round_number++;
+            play_game(round_number, total_rounds);
+        }
+    }, 1000);
+}
+
+function show_leaderboard() {
+
 }
 
 function render_next_round() {
     round_number_div.classList.remove('d-none');
+    populate_players_and_music();
 
     setTimeout(function () {
         round_number_div.style.opacity = '100';
@@ -105,7 +135,6 @@ function render_next_round() {
                 round_div.classList.remove('d-none');
 
                 setTimeout(function () {
-                    populate_player_cards();
                     round_div.style.opacity = '100';
                 }, 500)
             }, 500)
@@ -113,11 +142,11 @@ function render_next_round() {
     }, 500);
 }
 
-function populate_player_cards() {
-
+function populate_players_and_music() {
     socket.emit('get_players', lobby.code);
 
     socket.on('get_players', current_players => {
+        choose_random_song(current_players);
         let current_row;
         index = 0;
         for (let i = 0; i < current_players.length; i++) {
@@ -129,7 +158,8 @@ function populate_player_cards() {
 
                 let entry = document.createElement("div");
                 entry.classList.add('bg-transparent', 'border', 'border-light', 'col', 'p-4', 'mx-4', 'text-center')
-                let text = document.createElement("h2");
+                entry.setAttribute('id', 'player_card')
+                let text = document.createElement("h4");
                 text.innerText = player.username;
                 text.classList.add('text-light');
 
@@ -139,7 +169,8 @@ function populate_player_cards() {
             } else {
                 let entry = document.createElement("div");
                 entry.classList.add('bg-transparent', 'border', 'border-light', 'col', 'p-4', 'mx-4', 'text-center')
-                let text = document.createElement("h2");
+                entry.setAttribute('id', 'player_card')
+                let text = document.createElement("h4");
                 text.innerText = player.username;
                 text.classList.add('text-light');
 
@@ -149,11 +180,37 @@ function populate_player_cards() {
 
             index++;
         }
-    })
 
+        let player_cards = document.querySelectorAll('#player_card');
+        for (let index = 0; index < player_cards.length; index++) {
+            player_cards[index].addEventListener("click", () => {
+                console.log("clicked!")
+            });
+        }
+    })
 }
 
+function choose_random_song(current_players) {
+    let combined_array = [];
 
+    for (let index = 0; index < current_players.length; index++) {
+        combined_array = combined_array.concat(current_players[index].top_tracks);
+    }
+
+    random_num = Math.floor(Math.random() * combined_array.length);
+    random_song = combined_array[random_num];
+
+    let song_image_url = random_song.album.images[0].url;
+    let song_preview_url = random_song.preview_url;
+    let title = random_song.name;
+    let artist = random_song.artists[0].name;
+
+    album_image.setAttribute('src', song_image_url);
+    song_title.innerText = title;
+    song_artist.innerText = artist;
+
+
+}
 
 
 start_game_button.addEventListener("click", () => {

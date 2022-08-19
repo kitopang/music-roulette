@@ -15,8 +15,10 @@
 
 <body>
     <div class="container-fluid min-vh-100" style="background-color: #252525;">
+
         <h1 class="display-5 text-light mb-1 pt-5 px-5">musicRoulette.io</h1>
         <h1 class="display-5 text-light mb-5 px-5" id="lobby_number">Lobby:</h1>
+        <h1 class="display-5 text-light mb-5 px-5 d-none" id="timer">30s</h1>
 
         <div class="" id="lobby">
             <div class="justify-content-center mx-auto align-items-center d-flex">
@@ -37,21 +39,20 @@
         </div>
 
         <div class="d-flex justify-content-center align-items-center d-none row" id="round">
-            <div class="bg-transparent border border-light col-11 col-lg-7 rounded row p-2 p-md-4">
-                <div class="col-lg-3 col-md-4 col-5"><img id="album_image"
-                        src="https://i.scdn.co/image/ab67616d0000b273ec52cc4ae0786155757ee498" class="img-thumbnail"
-                        alt="Responsive image">
+            <div class="bg-transparent border border-light col-11 col-lg-7 rounded row p-1 p-md-4">
+                <div class="col-lg-3 col-md-4 col-5"><img id="album_image" src="album-placeholder.png"
+                        class="img-thumbnail" alt="Responsive image">
                 </div>
                 <div class="col-lg-6 col-7 pt-4">
-                    <h3 class="text-light">Song title</h3>
-                    <h4 class="text-light">Artist</h3>
+                    <h3 class="text-light" id="song_title">Song title</h3>
+                    <h4 class="text-light" id="song_artist">Artist</h3>
                 </div>
                 <div class="col d-flex align-items-center justify-content-center">
                     <button id="play_button" type="button" class="btn btn-outline-light btn-circle btn-sm">▷</button>
                 </div>
             </div>
 
-            <div id="player_choices" class="row mt-5 col-7">
+            <div id="player_choices" class="row mt-1 col-7">
 
             </div>
 
