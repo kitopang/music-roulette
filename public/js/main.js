@@ -8,6 +8,13 @@ const player_choices_div = document.querySelector('#player_choices');
 const album_image = document.querySelector('#album_image');
 const song_title = document.querySelector('#song_title');
 const song_artist = document.querySelector('#song_artist');
+const play_button = document.querySelector('#play_button');
+const myAudio = document.createElement('audio');
+
+let song_url;
+let chosen_player;
+let selected_card;
+let choice_is_correct;
 
 
 const lobby = Qs.parse(location.search, {
@@ -53,12 +60,44 @@ socket.on('startgame', start => {
 
         setTimeout(function () {
             lobby_div.classList.add('d-none');
-            initialize_game();
         }, 500);
     }
 
     console.log(start)
 })
+
+socket.on('new_round', lobby_data => {
+    render_next_round(lobby_data);
+});
+
+socket.on('select', (object) => {
+    let player_card = object.card;
+    let correct = object.correct;
+
+    console.log(player_card);
+    console.log(correct);
+
+    if (player_card.value === "false") {
+        player_card.classList.remove('bg-transparent', 'border-light');
+        player_card.classList.add('bg-light', 'border-dark');
+        text.classList.remove('text-light');
+        text.classList.add('text-dark');
+        player_card.value = "true";
+    } else {
+        player_card.classList.remove('bg-light', 'border-dark');
+        player_card.classList.add('bg-transparent', 'border-light');
+        text.classList.remove('text-dark');
+        text.classList.add('text-light');
+        player_card.value = "false";
+    }
+
+    selected_card = player_card;
+    if (correct) {
+        choice_is_correct = true;
+    } else {
+        choice_is_correct = false;
+    }
+});
 
 function add_player_to_lobby(player) {
     let entry = document.createElement('li');
@@ -82,47 +121,23 @@ function remove_player_from_lobby(player) {
     }
 }
 
-function initialize_game() {
-    const total_rounds = 16;
-    const time_per_round = 30;
-
-
-    play_game(0, total_rounds);
-}
-
-function play_game(round_number, total_rounds) {
-    let player_cards;
-    let seconds = 0;
-
-    if (round_number === total_rounds) {
-        return;
-    }
-
-    if (round_number === 0) {
-        player_cards = render_next_round();
-    } else {
-        show_leaderboard();
-        player_cards = render_next_round();
-    }
-
-    const interval = setInterval(function () {
-        console.log(seconds);
-        seconds++;
-        if (seconds === 30) {
-            clearInterval(interval);
-            round_number++;
-            play_game(round_number, total_rounds);
-        }
-    }, 1000);
-}
 
 function show_leaderboard() {
 
 }
 
-function render_next_round() {
+function render_next_round(lobby_data) {
+    round_div.classList.add('d-none');
+
+    while (player_choices_div.firstChild) {
+        player_choices_div.removeChild(player_choices_div.firstChild);
+    }
+
     round_number_div.classList.remove('d-none');
-    populate_players_and_music();
+    play_button.value = "false";
+    myAudio.pause();
+    populate_players(lobby_data);
+    set_random_song(lobby_data);
 
     setTimeout(function () {
         round_number_div.style.opacity = '100';
@@ -142,81 +157,86 @@ function render_next_round() {
     }, 500);
 }
 
-function populate_players_and_music() {
-    socket.emit('get_players', lobby.code);
+function populate_players(lobby_data) {
+    let current_players = lobby_data.current_players;
 
-    socket.on('get_players', current_players => {
-        choose_random_song(current_players);
-        let current_row;
-        index = 0;
-        for (let i = 0; i < current_players.length; i++) {
-            let player = current_players[i];
+    let current_row;
+    index = 0;
+    for (let i = 0; i < current_players.length; i++) {
+        let player = current_players[i];
 
-            if ((index % 2) === 0) {
-                current_row = document.createElement("div");
-                current_row.classList.add('row', 'mt-3');
+        if ((index % 2) === 0) {
+            current_row = document.createElement("div");
+            current_row.classList.add('row', 'mt-3');
 
-                let entry = document.createElement("div");
-                entry.classList.add('bg-transparent', 'border', 'border-light', 'col', 'p-4', 'mx-4', 'text-center')
-                entry.setAttribute('id', 'player_card')
-                let text = document.createElement("h4");
-                text.innerText = player.username;
-                text.classList.add('text-light');
+            let entry = document.createElement("div");
+            entry.classList.add('bg-transparent', 'border', 'border-light', 'col', 'p-4', 'mx-4', 'text-center')
+            entry.setAttribute('id', 'player_card')
+            entry.setAttribute('value', 'false');
+            let text = document.createElement("h4");
+            text.innerText = player.username;
+            text.classList.add('text-light');
 
-                player_choices_div.append(current_row);
-                current_row.append(entry);
-                entry.append(text);
-            } else {
-                let entry = document.createElement("div");
-                entry.classList.add('bg-transparent', 'border', 'border-light', 'col', 'p-4', 'mx-4', 'text-center')
-                entry.setAttribute('id', 'player_card')
-                let text = document.createElement("h4");
-                text.innerText = player.username;
-                text.classList.add('text-light');
+            player_choices_div.append(current_row);
+            current_row.append(entry);
+            entry.append(text);
+        } else {
+            let entry = document.createElement("div");
+            entry.classList.add('bg-transparent', 'border', 'border-light', 'col', 'p-4', 'mx-4', 'text-center')
+            entry.setAttribute('id', 'player_card');
+            entry.setAttribute('value', 'false');
+            let text = document.createElement("h4");
+            text.innerText = player.username;
+            text.classList.add('text-light');
 
-                current_row.append(entry);
-                entry.append(text);
-            }
-
-            index++;
+            current_row.append(entry);
+            entry.append(text);
         }
 
-        let player_cards = document.querySelectorAll('#player_card');
-        for (let index = 0; index < player_cards.length; index++) {
-            player_cards[index].addEventListener("click", () => {
-                console.log("clicked!")
-            });
-        }
-    })
-}
-
-function choose_random_song(current_players) {
-    let combined_array = [];
-
-    for (let index = 0; index < current_players.length; index++) {
-        combined_array = combined_array.concat(current_players[index].top_tracks);
+        index++;
     }
 
-    random_num = Math.floor(Math.random() * combined_array.length);
-    random_song = combined_array[random_num];
+    let player_cards = document.querySelectorAll('#player_card');
+    for (let index = 0; index < player_cards.length; index++) {
+        let player_card = player_cards[index];
+        let text = player_card.firstChild;
 
-    let song_image_url = random_song.album.images[0].url;
-    let song_preview_url = random_song.preview_url;
-    let title = random_song.name;
-    let artist = random_song.artists[0].name;
+        player_card.addEventListener("click", () => {
+            console.log(player_card);
+            socket.emit('select', { card: player_card });
 
-    album_image.setAttribute('src', song_image_url);
-    song_title.innerText = title;
-    song_artist.innerText = artist;
+        });
 
+    }
 
 }
 
+function set_random_song(song_data) {
+    album_image.setAttribute('src', song_data.song_image_url);
+    song_title.innerText = song_data.title;
+    song_artist.innerText = song_data.artist;
+    song_url = song_data.song_url;
+}
+
+
+play_button.addEventListener("click", () => {
+    myAudio.setAttribute('src', song_url);
+
+    if (play_button.value === "false") {
+        myAudio.play();
+        play_button.value = "true";
+    } else {
+        myAudio.pause();
+        play_button.value = "false";
+    }
+})
 
 start_game_button.addEventListener("click", () => {
     socket.emit('startgame', 'true');
     console.log("emits")
 });
+
+
 
 // const myAudio = document.createElement('audio');
 

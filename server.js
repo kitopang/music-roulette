@@ -31,14 +31,14 @@ io.on('connection', socket => {
 
     socket.on('join_lobby', (code) => {
         const spotify_item = get_spotify(clientIp);
-        const player = player_join(socket.id, spotify_item.username, code, spotify_item.topTracks);
+        const player = player_join(socket.id, spotify_item.username, code, spotify_item.topTracks, 0);
 
         socket.join(player.lobby_code)
         console.log(player.username);
 
 
-        socket.broadcast.to(player.lobby_code).emit('message', spotify_item.username + ' has joined the lobby');
-        socket.broadcast.to(player.lobby_code).emit('join_lobby', player);
+        socket.to(player.lobby_code).emit('message', spotify_item.username + ' has joined the lobby');
+        socket.to(player.lobby_code).emit('join_lobby', player);
     })
 
     socket.on('initialize_lobby', (code) => {
@@ -61,16 +61,72 @@ io.on('connection', socket => {
         let player = get_player(socket.id);
         console.log(player);
 
-        io.emit('disconnect_player', player);
+        socket.to(player.lobby_code).emit('disconnect_player', player);
         socket.leave(player.lobby_code);
         player_leave(socket.id);
     });
 
     //Listen for start command
     socket.on('startgame', (start) => {
-        io.emit('startgame', start)
+        let player = get_player(socket.id);
+        io.in(player.lobby_code).emit('startgame', start);
+
+        // Recursive call
+        game_timer(0, 15, socket);
     })
+
+
 })
+
+function game_timer(round_number, total_rounds, socket) {
+    //Base case
+    if (round_number === total_rounds) {
+        io.in(player.lobby_code).emit('end_game', '')
+        return;
+    }
+
+    let player = get_player(socket.id);
+    let lobby_info = choose_random_song(socket, round_number);
+    io.in(player.lobby_code).emit('new_round', lobby_info);
+
+    socket.on('select', (player_card) => {
+        let object;
+        console.log(player_card);
+
+        if (player_card.innerText === lobby_info.player_chosen.username) {
+            object = { correct: true, card: player_card }
+            socket.emit('select', object);
+        } else {
+            object = { correct: false, card: player_card }
+            socket.emit('select', object)
+        }
+    });
+
+    let seconds = 0;
+    const interval = setInterval(function () {
+        console.log(seconds);
+        seconds++;
+        if (seconds === 8) {
+            clearInterval(interval);
+            round_number++;
+            game_timer(round_number, total_rounds, socket);
+        }
+    }, 1000);
+}
+
+function choose_random_song(socket, round_number) {
+    let lobby = get_player(socket.id).lobby_code;
+    let current_players = populate_lobby(lobby);
+
+    let random_player_index = Math.floor(Math.random() * current_players.length);
+    let random_player = current_players[random_player_index];
+    let random_song_index = Math.floor(Math.random() * random_player.top_tracks.length);
+    let random_song = random_player.top_tracks[random_song_index];
+
+    let song_data = { song_image_url: random_song.album.images[0].url, song_url: random_song.preview_url, title: random_song.name, artist: random_song.artists[0].name, player_chosen: random_player, current_players: current_players, round: round_number }
+
+    return song_data;
+}
 
 
 var SpotifyWebApi = require('spotify-web-api-node');

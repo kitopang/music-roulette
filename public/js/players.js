@@ -1,7 +1,7 @@
 const players = [];
 
-function player_join(socket_id, username, lobby_code, top_tracks) {
-    const player = { socket_id, username, lobby_code, top_tracks };
+function player_join(socket_id, username, lobby_code, top_tracks, score) {
+    const player = { socket_id, username, lobby_code, top_tracks, score };
 
     players.push(player);
 
@@ -26,10 +26,17 @@ function get_player(socket_id) {
     return players.find(player => player.socket_id === socket_id);
 }
 
+function increment_score(socket_id) {
+    let player = get_player(socket_id);
+    player.score++;
+}
+
+
 
 module.exports = {
     player_join,
     player_leave,
     populate_lobby,
-    get_player
+    get_player,
+    increment_score
 };
