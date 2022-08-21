@@ -58,6 +58,7 @@ io.on('connection', socket => {
     })
 
     socket.on('disconnect', () => {
+        console.log("socket! " + socket.id);
         let player = get_player(socket.id);
         console.log(player);
 
@@ -75,8 +76,9 @@ io.on('connection', socket => {
         game_timer(0, 15, socket);
     })
 
-
 })
+
+
 
 function game_timer(round_number, total_rounds, socket) {
     //Base case
@@ -84,34 +86,40 @@ function game_timer(round_number, total_rounds, socket) {
         io.in(player.lobby_code).emit('end_game', '')
         return;
     }
-
+    const ready_players = new Set();
     let player = get_player(socket.id);
     let lobby_info = choose_random_song(socket, round_number);
     io.in(player.lobby_code).emit('new_round', lobby_info);
-
-    socket.on('select', (player_card) => {
-        let object;
-        console.log(player_card);
-
-        if (player_card.innerText === lobby_info.player_chosen.username) {
-            object = { correct: true, card: player_card }
-            socket.emit('select', object);
-        } else {
-            object = { correct: false, card: player_card }
-            socket.emit('select', object)
-        }
-    });
 
     let seconds = 0;
     const interval = setInterval(function () {
         console.log(seconds);
         seconds++;
-        if (seconds === 8) {
+        if (seconds === 30) {
             clearInterval(interval);
             round_number++;
             game_timer(round_number, total_rounds, socket);
         }
     }, 1000);
+
+    socket.on('ready', (username) => {
+        ready_players.add(username);
+        let ready = true;
+
+        console.log(ready_players);
+
+        console.log(lobby_info.current_players[0]);
+        for (let i = 0; i < lobby_info.current_players.length; i++) {
+            if (!ready_players.has(lobby_info.current_players[i].username)) {
+                ready = false;
+            }
+        }
+
+        if (ready) {
+            clearInterval(interval);
+            game_timer(round_number, total_rounds, socket);
+        }
+    });
 }
 
 function choose_random_song(socket, round_number) {

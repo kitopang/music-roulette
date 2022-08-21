@@ -19,7 +19,6 @@
 
 #create_game:hover {
     transition: background-color .5s;
-    background-color: gray !important;
 }
 
 #play_button {
@@ -39,4 +38,7 @@
     border: 0;
 }
 
-#h1 {}
+#player_card:hover {
+    transition: background-color 1s;
+    background-color: gray;
+}

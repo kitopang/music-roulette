@@ -13,7 +13,8 @@ const myAudio = document.createElement('audio');
 
 let song_url;
 let chosen_player;
-let selected_card;
+let global_selected_card;
+let global_prev_card;
 let choice_is_correct;
 
 
@@ -68,30 +69,15 @@ socket.on('startgame', start => {
 
 socket.on('new_round', lobby_data => {
     render_next_round(lobby_data);
+    global_selected_card = undefined;
 });
 
-socket.on('select', (object) => {
-    let player_card = object.card;
-    let correct = object.correct;
+socket.on('select', (correct) => {
+    let selected_card = global_selected_card;
+    let text = selected_card.firstChild;
 
-    console.log(player_card);
-    console.log(correct);
 
-    if (player_card.value === "false") {
-        player_card.classList.remove('bg-transparent', 'border-light');
-        player_card.classList.add('bg-light', 'border-dark');
-        text.classList.remove('text-light');
-        text.classList.add('text-dark');
-        player_card.value = "true";
-    } else {
-        player_card.classList.remove('bg-light', 'border-dark');
-        player_card.classList.add('bg-transparent', 'border-light');
-        text.classList.remove('text-dark');
-        text.classList.add('text-light');
-        player_card.value = "false";
-    }
 
-    selected_card = player_card;
     if (correct) {
         choice_is_correct = true;
     } else {
@@ -198,17 +184,31 @@ function populate_players(lobby_data) {
 
     let player_cards = document.querySelectorAll('#player_card');
     for (let index = 0; index < player_cards.length; index++) {
-        let player_card = player_cards[index];
-        let text = player_card.firstChild;
+        let selected_card = player_cards[index];
+        let text = selected_card.firstChild;
 
-        player_card.addEventListener("click", () => {
-            console.log(player_card);
-            socket.emit('select', { card: player_card });
+        selected_card.addEventListener("click", () => {
+            if (!global_selected_card) {
+                selected_card.classList.remove('bg-transparent', 'border-light');
+                selected_card.classList.add('bg-light', 'border-dark');
+                text.classList.remove('text-light');
+                text.classList.add('text-dark');
+                selected_card.value = "true";
 
+                global_selected_card = selected_card;
+                socket.emit('ready', selected_card.innerText);
+            }
         });
-
     }
+}
 
+function remove_selection(player_card) {
+    let text = player_card.firstChild;
+    player_card.classList.remove('bg-light', 'border-dark');
+    player_card.classList.add('bg-transparent', 'border-light');
+    text.classList.remove('text-dark');
+    text.classList.add('text-light');
+    player_card.value = "false";
 }
 
 function set_random_song(song_data) {
@@ -233,7 +233,7 @@ play_button.addEventListener("click", () => {
 
 start_game_button.addEventListener("click", () => {
     socket.emit('startgame', 'true');
-    console.log("emits")
+    console.log("emits");
 });
 
 

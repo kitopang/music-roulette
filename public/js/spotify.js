@@ -6,12 +6,12 @@ const spotify_api = new SpotifyWebApi();
 
 
 function add_spotify(access_token, ip_address) {
+    console.log("access: " + access_token)
     spotify_api.setAccessToken(access_token);
 
     spotify_api.getMyTopTracks()
         .then(function (data) {
             let topTracks = data.body.items;
-            console.log(topTracks[1].album.images);
             spotify_api.getMe()
                 .then(function (data) {
                     console.log('Some information about the authenticated user', data.body);
