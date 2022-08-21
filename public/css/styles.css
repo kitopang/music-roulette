@@ -17,8 +17,26 @@
     opacity: 0;
 }
 
+#create_game {
+    background-color: transparent !important;
+}
+
 #create_game:hover {
-    transition: background-color .5s;
+    background-color: gray !important;
+    -webkit-transition: background-color 500ms linear;
+    -ms-transition: background-color 500ms linear;
+    transition: background-color 500ms linear;
+}
+
+#join_game {
+    background-color: transparent !important;
+}
+
+#join_game:hover {
+    background-color: gray !important;
+    -webkit-transition: background-color 500ms linear;
+    -ms-transition: background-color 500ms linear;
+    transition: background-color 500ms linear;
 }
 
 #play_button {
@@ -41,4 +59,20 @@
 #player_card:hover {
     transition: background-color 1s;
     background-color: gray;
+}
+
+body {
+    overflow: hidden;
+
+}
+
+#main {
+    background-image: url('spot2.png');
+    background-size: cover;
+    background-position: center;
+}
+
+#score {
+    opacity: 0;
+    transition: opacity .5s;
 }

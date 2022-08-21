@@ -10,11 +10,12 @@ const song_title = document.querySelector('#song_title');
 const song_artist = document.querySelector('#song_artist');
 const play_button = document.querySelector('#play_button');
 const myAudio = document.createElement('audio');
+const score_div = document.querySelector('#score');
+const round_num = document.querySelector('#round_num');
 
 let song_url;
 let chosen_player;
 let global_selected_card;
-let global_prev_card;
 let choice_is_correct;
 
 
@@ -73,25 +74,31 @@ socket.on('new_round', lobby_data => {
 });
 
 socket.on('select', (correct) => {
-    let selected_card = global_selected_card;
-    let text = selected_card.firstChild;
-
-
-
-    if (correct) {
-        choice_is_correct = true;
-    } else {
-        choice_is_correct = false;
-    }
+    choice_is_correct = correct;
 });
 
+socket.on('show_results', round_number => {
+    if (global_selected_card) {
+        if (choice_is_correct) {
+            global_selected_card.classList.remove("bg-light");
+            global_selected_card.classList.add("bg-success");
+        } else {
+            global_selected_card.classList.remove("bg-light");
+            global_selected_card.classList.add("bg-danger");
+        }
+    }
+
+    round_num.innerText = "Round " + (round_number + 1) + "/15";
+    show_leaderboard();
+})
+
 function add_player_to_lobby(player) {
-    let entry = document.createElement('li');
+    let entry = document.createElement('p');
     entry.classList.add('list-group-item');
     entry.classList.add('bg-transparent');
     entry.classList.add('border');
     entry.classList.add('border-light');
-    entry.classList.add('text-light');
+    entry.classList.add('text-light', 'p-3', 'fw-bold', 'h5');
     entry.innerText = player.username;
 
     joined_players_div.appendChild(entry);
@@ -109,7 +116,21 @@ function remove_player_from_lobby(player) {
 
 
 function show_leaderboard() {
-
+    setTimeout(function () {
+        round_div.style.opacity = 0;
+        setTimeout(function () {
+            round_div.classList.add('d-none');
+            console.log('firing');
+            score_div.classList.remove('d-none');
+            score_div.style.opacity = 100;
+            setTimeout(function () {
+                score_div.style.opacity = 0;
+                setTimeout(function () {
+                    score_div.classList.add('d-none');
+                }, 1000);
+            }, 2000);
+        }, 1000);
+    }, 1000);
 }
 
 function render_next_round(lobby_data) {
@@ -161,7 +182,7 @@ function populate_players(lobby_data) {
             entry.setAttribute('value', 'false');
             let text = document.createElement("h4");
             text.innerText = player.username;
-            text.classList.add('text-light');
+            text.classList.add('text-light', 'fw-bold');
 
             player_choices_div.append(current_row);
             current_row.append(entry);
@@ -173,7 +194,7 @@ function populate_players(lobby_data) {
             entry.setAttribute('value', 'false');
             let text = document.createElement("h4");
             text.innerText = player.username;
-            text.classList.add('text-light');
+            text.classList.add('text-light', 'fw-bold');
 
             current_row.append(entry);
             entry.append(text);
@@ -196,7 +217,11 @@ function populate_players(lobby_data) {
                 selected_card.value = "true";
 
                 global_selected_card = selected_card;
-                socket.emit('ready', selected_card.innerText);
+
+                setTimeout(function () {
+                    socket.emit('ready', selected_card.innerText);
+                }, 1000);
+
             }
         });
     }

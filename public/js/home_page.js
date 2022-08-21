@@ -1,5 +1,6 @@
 const create_game_div = document.querySelector('#create_game');
 const create_game_input = document.querySelector('#create_game_input');
+const join_game_div = document.querySelector('#join_game');
 
 game_codes = []
 

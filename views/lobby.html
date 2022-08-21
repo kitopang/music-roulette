@@ -14,28 +14,31 @@
 </head>
 
 <body>
-    <div class="container-fluid min-vh-100" style="background-color: #252525;">
+    <div class="container-fluid min-vh-100" style="background-color: #000000;">
 
-        <h1 class="display-5 text-light mb-1 pt-5 px-5">musicRoulette.io</h1>
-        <h1 class="display-5 text-light mb-5 px-5" id="lobby_number">Lobby:</h1>
-        <h1 class="display-5 text-light mb-5 px-5 d-none" id="timer">30s</h1>
+        <h1 class="display-5 text-light mb-1 pt-5 px-5 fw-bold"><span style="color: #43A047">musicRoulette</span><span
+                style="color: #ffffff">.io</span>
+        </h1>
+        <h1 class="display-5 text-light mb-5 px-5 fw-bold" id="lobby_number">Lobby:</h1>
 
         <div class="" id="lobby">
             <div class="justify-content-center mx-auto align-items-center d-flex">
                 <ul class="list-group list-group-flush bg-transparent col-7" id="joined_players_list">
-                    <li class="text-center list-group-item bg-dark border border-light text-light rounded-top">---
+                    <li
+                        class="p-2 fw-bold text-center list-group-item bg-primary border border-light text-light rounded-top">
+                        ---
                         Joined
                         Players ---
                     </li>
                 </ul>
             </div>
-            <div class="justify-content-end d-flex col-9">
-                <button type="button" class="btn btn-outline-light" id="start_button">Start Game</button>
+            <div class="justify-content-end d-flex col-9 py-4 ms-5">
+                <button type="button" class="btn btn-outline-light fw-bold" id="start_button">Start Game</button>
             </div>
         </div>
 
         <div class="d-flex justify-content-center align-items-center d-none" id="round_number">
-            <h1 class="display-5 text-light mt-5 pt-5 px-5">Round 1/15</h1>
+            <h1 class="display-5 text-light mt-5 pt-5 px-5 fw-bold" id="round_num">Round 1/15</h1>
         </div>
 
         <div class="d-flex justify-content-center align-items-center d-none row" id="round">
@@ -44,8 +47,8 @@
                         class="img-thumbnail" alt="Responsive image">
                 </div>
                 <div class="col-lg-6 col-7 pt-4">
-                    <h3 class="text-light" id="song_title">Song title</h3>
-                    <h4 class="text-light" id="song_artist">Artist</h3>
+                    <h2 class="text-primary fw-bold" id="song_title">Song title</h2>
+                    <h3 class="text-primary fw-bold fst-italic" id="song_artist">Artist</h3>
                 </div>
                 <div class="col d-flex align-items-center justify-content-center">
                     <button id="play_button" type="button" class="btn btn-outline-light btn-circle btn-sm"
@@ -56,9 +59,28 @@
             <div id="player_choices" class="row mt-1 col-7">
 
             </div>
+        </div>
 
-            <div class="row m-5">
-                <h2 class="text-light justify-content-center align-items-center d-flex">30s</h2>
+        <div class="" id="score">
+            <div class="justify-content-center mx-auto align-items-center d-flex">
+                <ul class="list-group list-group-flush bg-transparent col-7" id="scoreboard">
+                    <li
+                        class="p-2 fw-bold text-center list-group-item bg-primary border border-light text-light rounded-top">
+                        ---
+                        Scoreboard ---
+                    </li>
+                    <li
+                        class="justify-content-between d-flex text-light list-group-item bg-transparent border border-light text-light pt-3">
+                        <p class="h5">Kito</p>
+                        <p class="h5">5</p>
+                        <!-- 
+                  entry.classList.add('list-group-item');
+                  entry.classList.add('bg-transparent');
+                  entry.classList.add('border');
+                  entry.classList.add('border-light');
+                  entry.classList.add('text-light', 'p-3', 'fw-bold'); -->
+                    </li>
+                </ul>
             </div>
         </div>
 

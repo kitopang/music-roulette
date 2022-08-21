@@ -60,11 +60,14 @@ io.on('connection', socket => {
     socket.on('disconnect', () => {
         console.log("socket! " + socket.id);
         let player = get_player(socket.id);
-        console.log(player);
 
-        socket.to(player.lobby_code).emit('disconnect_player', player);
-        socket.leave(player.lobby_code);
-        player_leave(socket.id);
+        if (player) {
+            socket.to(player.lobby_code).emit('disconnect_player', player);
+            socket.leave(player.lobby_code);
+            player_leave(socket.id);
+        } else {
+            player_leave(socket.id);
+        }
     });
 
     //Listen for start command
@@ -79,47 +82,64 @@ io.on('connection', socket => {
 })
 
 
-
 function game_timer(round_number, total_rounds, socket) {
     //Base case
     if (round_number === total_rounds) {
         io.in(player.lobby_code).emit('end_game', '')
         return;
     }
+    let seconds = 0;
     const ready_players = new Set();
     let player = get_player(socket.id);
     let lobby_info = choose_random_song(socket, round_number);
     io.in(player.lobby_code).emit('new_round', lobby_info);
 
-    let seconds = 0;
+
     const interval = setInterval(function () {
         console.log(seconds);
         seconds++;
         if (seconds === 30) {
             clearInterval(interval);
+
             round_number++;
-            game_timer(round_number, total_rounds, socket);
+            io.in(player.lobby_code).emit('show_results', round_number);
+
+            setTimeout(function () {
+                game_timer(round_number, total_rounds, socket);
+            }, 5000);
         }
     }, 1000);
 
     socket.on('ready', (username) => {
         ready_players.add(username);
         let ready = true;
-
-        console.log(ready_players);
-
-        console.log(lobby_info.current_players[0]);
         for (let i = 0; i < lobby_info.current_players.length; i++) {
             if (!ready_players.has(lobby_info.current_players[i].username)) {
                 ready = false;
             }
         }
 
+        if (username === lobby_info.player_chosen.username) {
+            io.in(player.lobby_code).emit('select', true);
+        } else {
+            io.in(player.lobby_code).emit('select', false);
+        }
+
         if (ready) {
             clearInterval(interval);
-            game_timer(round_number, total_rounds, socket);
+
+            round_number++;
+            io.in(player.lobby_code).emit('show_results', round_number);
+
+            setTimeout(function () {
+                game_timer(round_number, total_rounds, socket);
+            }, 5000);
         }
     });
+}
+
+function emit_results(socket) {
+
 }
 
 function choose_random_song(socket, round_number) {
