@@ -57,6 +57,10 @@
 }
 
 #player_card:hover {
+    background-color: transparent;
+}
+
+#player_card:hover {
     transition: background-color 1s;
     background-color: gray;
 }
@@ -67,7 +71,7 @@ body {
 }
 
 #main {
-    background-image: url('spot2.png');
+    background-image: url('spot2.jpg');
     background-size: cover;
     background-position: center;
 }

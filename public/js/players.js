@@ -1,7 +1,7 @@
 const players = [];
 
-function player_join(socket_id, username, lobby_code, top_tracks, score) {
-    const player = { socket_id, username, lobby_code, top_tracks, score };
+function player_join(socket_id, username, lobby_code, top_tracks, score, round_num, lobby_info) {
+    const player = { socket_id, username, lobby_code, top_tracks, score, round_num, lobby_info };
 
     players.push(player);
 
@@ -31,6 +31,19 @@ function increment_score(socket_id) {
     player.score++;
 }
 
+function increment_round(lobby_code) {
+    all_players = populate_lobby(lobby_code);
+
+    for (let i = 0; i < all_players.length; i++) {
+        all_players[i].round_num++;
+    }
+}
+
+function get_round(socket_id) {
+    return get_player(socket_id).round_num;
+}
+
+
 
 
 module.exports = {
@@ -38,5 +51,6 @@ module.exports = {
     player_leave,
     populate_lobby,
     get_player,
-    increment_score
+    increment_score,
+    increment_round
 };

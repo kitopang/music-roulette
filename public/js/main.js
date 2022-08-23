@@ -68,8 +68,8 @@ socket.on('startgame', start => {
     console.log(start)
 })
 
-socket.on('new_round', lobby_data => {
-    render_next_round(lobby_data);
+socket.on('new_round', (music_data, player_data) => {
+    render_next_round(music_data, player_data);
     global_selected_card = undefined;
 });
 
@@ -133,7 +133,7 @@ function show_leaderboard() {
     }, 1000);
 }
 
-function render_next_round(lobby_data) {
+function render_next_round(music_data, player_data) {
     round_div.classList.add('d-none');
 
     while (player_choices_div.firstChild) {
@@ -143,8 +143,8 @@ function render_next_round(lobby_data) {
     round_number_div.classList.remove('d-none');
     play_button.value = "false";
     myAudio.pause();
-    populate_players(lobby_data);
-    set_random_song(lobby_data);
+    populate_players(player_data);
+    set_random_song(music_data);
 
     setTimeout(function () {
         round_number_div.style.opacity = '100';
@@ -164,8 +164,8 @@ function render_next_round(lobby_data) {
     }, 500);
 }
 
-function populate_players(lobby_data) {
-    let current_players = lobby_data.current_players;
+function populate_players(player_data) {
+    let current_players = player_data;
 
     let current_row;
     index = 0;
@@ -177,7 +177,7 @@ function populate_players(lobby_data) {
             current_row.classList.add('row', 'mt-3');
 
             let entry = document.createElement("div");
-            entry.classList.add('bg-transparent', 'border', 'border-light', 'col', 'p-4', 'mx-4', 'text-center')
+            entry.classList.add('border', 'border-light', 'col', 'p-4', 'mx-4', 'text-center')
             entry.setAttribute('id', 'player_card')
             entry.setAttribute('value', 'false');
             let text = document.createElement("h4");
@@ -208,6 +208,7 @@ function populate_players(lobby_data) {
         let selected_card = player_cards[index];
         let text = selected_card.firstChild;
 
+        // Listener for player card selection
         selected_card.addEventListener("click", () => {
             if (!global_selected_card) {
                 selected_card.classList.remove('bg-transparent', 'border-light');
@@ -221,7 +222,6 @@ function populate_players(lobby_data) {
                 setTimeout(function () {
                     socket.emit('ready', selected_card.innerText);
                 }, 1000);
-
             }
         });
     }
@@ -236,11 +236,11 @@ function remove_selection(player_card) {
     player_card.value = "false";
 }
 
-function set_random_song(song_data) {
-    album_image.setAttribute('src', song_data.song_image_url);
-    song_title.innerText = song_data.title;
-    song_artist.innerText = song_data.artist;
-    song_url = song_data.song_url;
+function set_random_song(music_data) {
+    album_image.setAttribute('src', music_data.song_image_url);
+    song_title.innerText = music_data.title;
+    song_artist.innerText = music_data.artist;
+    song_url = music_data.song_url;
 }
 
 
