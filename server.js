@@ -73,7 +73,8 @@ io.on('connection', socket => {
 
         lobby.ready_players++;
 
-        if (username === lobby.music_info.player_chosen.username) {
+        if (username.trim() === lobby.music_info.player_chosen.username.trim()) {
+            console.log("TRUE");
             let score = Math.floor((1 - ((lobby.time_elapsed / lobby.max_time) / 2)) * 1000);
             player.score += score;
             socket.emit('select', true);
@@ -108,8 +109,8 @@ function game_timer(lobby, socket) {
     let music_info = choose_random_song(lobby.players);
 
     //Base case
-    if (lobby.current_round === lobby.max_rounds) {
-        io.in(player.lobby_code).emit('end_game', '')
+    if (lobby.current_round === 2) {
+        io.in(player.lobby_code).emit('end_game', lobby)
         return;
     }
 
@@ -140,7 +141,7 @@ function initiate_next_round(lobby, player, socket) {
 
     setTimeout(function () {
         game_timer(lobby, socket);
-    }, 5000);
+    }, 3000);
 }
 
 function choose_random_song(current_players) {

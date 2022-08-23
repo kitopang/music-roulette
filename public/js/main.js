@@ -65,8 +65,6 @@ socket.on('startgame', start => {
 
 socket.on('new_round', (music_data, player_data) => {
     render_next_round(music_data, player_data);
-    global_selected_card = undefined;
-    player_is_correct = undefined;
 });
 
 socket.on('select', (correct) => {
@@ -83,10 +81,17 @@ socket.on('show_results', lobby => {
             global_selected_card.classList.add("bg-danger");
         }
     }
+    global_selected_card = undefined;
+    player_is_correct = undefined;
 
     round_num.innerText = "Round " + (lobby.current_round + 1) + "/15";
+    myAudio.pause();
     show_leaderboard(lobby);
 })
+
+socket.on('end_game', lobby => {
+    show_leaderboard(lobby);
+});
 
 function add_player_to_lobby(player) {
     let entry = document.createElement('p');
@@ -111,7 +116,7 @@ function remove_player_from_lobby(player) {
 }
 
 
-function show_leaderboard(lobby) {
+function show_leaderboard(lobby, end_game) {
     let all_players = lobby.players;
 
     while (scoreboard.firstChild) {
@@ -143,11 +148,7 @@ function show_leaderboard(lobby) {
             score_div.classList.remove('d-none');
             score_div.style.opacity = 100;
             setTimeout(function () {
-                score_div.style.opacity = 0;
-                setTimeout(function () {
-                    score_div.classList.add('d-none');
-                }, 1000);
-            }, 2000);
+            }, 1000);
         }, 1000);
     }, 1000);
 }
@@ -159,28 +160,29 @@ function render_next_round(music_data, player_data) {
         player_choices_div.removeChild(player_choices_div.firstChild);
     }
 
-    round_number_div.classList.remove('d-none');
     play_button.value = "false";
-    myAudio.pause();
     populate_players(player_data);
     set_random_song(music_data);
 
     setTimeout(function () {
-        round_number_div.style.opacity = '100';
-
+        score_div.style.opacity = 0;
         setTimeout(function () {
-            round_number_div.style.opacity = '0';
-
+            score_div.classList.add('d-none');
+            round_number_div.classList.remove('d-none');
+            round_number_div.style.opacity = '100';
             setTimeout(function () {
-                round_number_div.classList.add('d-none');
-                round_div.classList.remove('d-none');
-
+                round_number_div.style.opacity = '0';
                 setTimeout(function () {
-                    round_div.style.opacity = '100';
+                    round_number_div.classList.add('d-none');
+                    round_div.classList.remove('d-none');
+
+                    setTimeout(function () {
+                        round_div.style.opacity = '100';
+                    }, 500)
                 }, 500)
-            }, 500)
+            }, 1000);
         }, 1000);
-    }, 500);
+    }, 1000);
 }
 
 function populate_players(player_data) {
@@ -239,7 +241,9 @@ function populate_players(player_data) {
                 global_selected_card = selected_card;
 
                 setTimeout(function () {
+                    console.log("SENDING " + selected_card.innerText)
                     socket.emit('ready', selected_card.innerText);
+
                 }, 1000);
             }
         });
