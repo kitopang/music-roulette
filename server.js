@@ -37,7 +37,7 @@ io.on('connection', socket => {
         const spotify_item = get_spotify(clientIp);
         const player = player_join(socket.id, spotify_item.username, code, spotify_item.topTracks, 0, undefined);
 
-        new_lobby(code, player, 1);
+        new_lobby(code, player, 15);
 
         socket.join(player.lobby_code)
         console.log(player.username);
@@ -97,8 +97,6 @@ io.on('connection', socket => {
         // Recursive call
         game_timer(lobby, socket);
     })
-
-
 })
 
 function game_timer(lobby, socket) {
@@ -116,7 +114,7 @@ function game_timer(lobby, socket) {
     io.in(player.lobby_code).emit('new_round', music_info, lobby.players, first_round);
 
     let interval = setInterval(function () {
-        console.log(seconds);
+        io.in(player.lobby_code).emit('update_time', lobby.max_time - seconds);
         lobby.time_elapsed = seconds;
         seconds++;
         if (seconds === lobby.max_time) {
@@ -222,8 +220,8 @@ app.get('/callback', (req, res) => {
                 `Sucessfully retreived access token. Expires in ${expires_in} s.`
             );
 
-            add_spotify(access_token, ip)
-            res.render('home_page.ejs')
+            add_spotify(access_token, ip, res)
+
 
 
             setInterval(async () => {

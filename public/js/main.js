@@ -15,6 +15,7 @@ const score_div = document.querySelector('#score');
 const round_num = document.querySelector('#round_num');
 const scoreboard = document.querySelector('#scoreboard');
 const end_buttons = document.querySelector('#end_buttons');
+const timer = document.querySelector('#time');
 
 let song_url;
 let chosen_player;
@@ -57,9 +58,14 @@ socket.on('startgame', start => {
     if (start === 'true') {
         lobby_div.style.opacity = '0';
         end_buttons.style.opacity = '0';
+        lobby_number.style.opacity = '0';
+
 
         setTimeout(function () {
             lobby_div.classList.add('d-none');
+            lobby_number.classList.add('d-none');
+            timer.classList.remove('d-none');
+            timer.style.opacity = '1';
         }, 500);
     }
 
@@ -96,6 +102,10 @@ socket.on('show_results', lobby => {
 socket.on('end_game', lobby => {
     end_buttons.classList.remove('d-none');
     end_buttons.style.opacity = '100';
+});
+
+socket.on('update_time', seconds => {
+    timer.innerText = "Time: " + seconds;
 });
 
 function add_player_to_lobby(player) {
@@ -158,6 +168,10 @@ function show_leaderboard(lobby, end_game) {
     }, 1000);
 }
 
+function update_time(seconds) {
+
+}
+
 function render_next_round(music_data, player_data, first_round) {
     round_div.classList.add('d-none');
 
@@ -180,7 +194,6 @@ function render_next_round(music_data, player_data, first_round) {
                 setTimeout(function () {
                     round_number_div.classList.add('d-none');
                     round_div.classList.remove('d-none');
-                    round_div.classList.add('d-flex')
                     setTimeout(function () {
                         round_div.style.opacity = '1';
                     }, 500)
@@ -302,6 +315,8 @@ play_button.addEventListener("click", () => {
         play_button.value = "false";
     }
 })
+
+
 
 start_game_button.addEventListener("click", () => {
     socket.emit('startgame', 'true');

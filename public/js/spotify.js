@@ -5,7 +5,7 @@ const spotify_data = [];
 const spotify_api = new SpotifyWebApi();
 
 
-function add_spotify(access_token, ip_address) {
+function add_spotify(access_token, ip_address, res) {
     console.log("access: " + access_token)
     spotify_api.setAccessToken(access_token);
 
@@ -17,6 +17,7 @@ function add_spotify(access_token, ip_address) {
                     console.log('Some information about the authenticated user', data.body);
                     spotify_item = { username: data.body.id, topTracks, ip_address }
                     spotify_data.push(spotify_item);
+                    res.render('home_page.ejs')
                 }, function (err) {
                     console.log('Something went wrong!', err);
                 });

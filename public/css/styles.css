@@ -18,6 +18,16 @@
     transition: opacity .5s;
 }
 
+#time {
+    opacity: 0;
+    transition: opacity .5s;
+}
+
+#lobby_number {
+    opacity: 1;
+    transition: opacity .5s;
+}
+
 #create_game_input {
     opacity: 0;
 }
