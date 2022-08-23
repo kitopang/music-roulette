@@ -12,11 +12,12 @@ const play_button = document.querySelector('#play_button');
 const myAudio = document.createElement('audio');
 const score_div = document.querySelector('#score');
 const round_num = document.querySelector('#round_num');
+const scoreboard = document.querySelector('#scoreboard');
 
 let song_url;
 let chosen_player;
 let global_selected_card;
-let choice_is_correct;
+let player_is_correct;
 
 
 const lobby = Qs.parse(location.search, {
@@ -50,12 +51,6 @@ socket.on('initialize_lobby', players => {
     }
 })
 
-// socket.emit('get_self', lobby.code)
-
-// socket.on('get_self', self_player => {
-//     add_player_to_lobby(self_player);
-// })
-
 socket.on('startgame', start => {
     if (start === 'true') {
         lobby_div.style.opacity = '0';
@@ -71,15 +66,16 @@ socket.on('startgame', start => {
 socket.on('new_round', (music_data, player_data) => {
     render_next_round(music_data, player_data);
     global_selected_card = undefined;
+    player_is_correct = undefined;
 });
 
 socket.on('select', (correct) => {
-    choice_is_correct = correct;
+    player_is_correct = correct;
 });
 
-socket.on('show_results', round_number => {
+socket.on('show_results', lobby => {
     if (global_selected_card) {
-        if (choice_is_correct) {
+        if (player_is_correct) {
             global_selected_card.classList.remove("bg-light");
             global_selected_card.classList.add("bg-success");
         } else {
@@ -88,8 +84,8 @@ socket.on('show_results', round_number => {
         }
     }
 
-    round_num.innerText = "Round " + (round_number + 1) + "/15";
-    show_leaderboard();
+    round_num.innerText = "Round " + (lobby.current_round + 1) + "/15";
+    show_leaderboard(lobby);
 })
 
 function add_player_to_lobby(player) {
@@ -115,12 +111,35 @@ function remove_player_from_lobby(player) {
 }
 
 
-function show_leaderboard() {
+function show_leaderboard(lobby) {
+    let all_players = lobby.players;
+
+    while (scoreboard.firstChild) {
+        scoreboard.removeChild(scoreboard.firstChild);
+    }
+
+    all_players.sort();
+
+    for (let i = 0; i < all_players.length; i++) {
+        let list_element = document.createElement('li');
+        let name = document.createElement('p');
+        let score = document.createElement('p');
+
+        list_element.classList.add('justify-content-between', 'd-flex', 'text-light', 'list-group-item', 'bg-transparent', 'border', 'border-light', 'text-light', 'pt-3');
+        name.classList.add('h5');
+        score.classList.add('h5');
+
+        name.innerText = all_players[i].username;
+        score.innerText = all_players[i].score;
+
+        list_element.append(name, score);
+        scoreboard.append(list_element);
+    }
+
     setTimeout(function () {
         round_div.style.opacity = 0;
         setTimeout(function () {
             round_div.classList.add('d-none');
-            console.log('firing');
             score_div.classList.remove('d-none');
             score_div.style.opacity = 100;
             setTimeout(function () {
@@ -261,13 +280,4 @@ start_game_button.addEventListener("click", () => {
     console.log("emits");
 });
 
-
-
-// const myAudio = document.createElement('audio');
-
-// if (myAudio.canPlayType('audio/mpeg')) {
-//     myAudio.setAttribute('src', 'https://p.scdn.co/mp3-preview/022b6aef48436fa9ffdebf761bde4a719d686dc3?cid=618a3849a7234a949622b2722ba8bfdb');
-// }
-
-// myAudio.play();
 

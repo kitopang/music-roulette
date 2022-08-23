@@ -17,9 +17,9 @@ const total_rounds = 15;
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'views')));
-const { player_join, player_leave, populate_lobby, get_player, increment_score, increment_round } = require('./public/js/players');
+const { player_join, player_leave, get_player } = require('./public/js/players');
 const { add_spotify, get_spotify } = require('./public/js/spotify');
-const { new_lobby, get_lobby, update_lobby_info, increment_ready_players, reset_ready_players } = require('./public/js/lobby');
+const { new_lobby, lobby_leave, get_lobby, sort_players } = require('./public/js/lobby');
 
 const PORT = process.env.PORT || 3000;
 
@@ -37,7 +37,7 @@ io.on('connection', socket => {
 
     socket.on('join_lobby', (code) => {
         const spotify_item = get_spotify(clientIp);
-        const player = player_join(socket.id, spotify_item.username, code, spotify_item.topTracks, 0, 0);
+        const player = player_join(socket.id, spotify_item.username, code, spotify_item.topTracks, 0, undefined);
 
         new_lobby(code, player);
 
@@ -52,46 +52,40 @@ io.on('connection', socket => {
         socket.emit('initialize_lobby', get_lobby(code).players)
     })
 
-
     socket.on('disconnect', () => {
         console.log("socket! " + socket.id);
         let player = get_player(socket.id);
 
         if (player) {
+            let lobby = get_lobby(player.lobby_code);
+
             socket.to(player.lobby_code).emit('disconnect_player', player);
             socket.leave(player.lobby_code);
             player_leave(socket.id);
-        } else {
-            player_leave(socket.id);
+            lobby_leave(player, lobby)
         }
+
     });
 
     socket.on('ready', (username) => {
         let player = get_player(socket.id);
         let lobby = get_lobby(player.lobby_code);
-        let ready = true;
 
-        increment_ready_players(lobby);
+        lobby.ready_players++;
 
         if (username === lobby.music_info.player_chosen.username) {
+            let score = Math.floor((1 - ((lobby.time_elapsed / lobby.max_time) / 2)) * 1000);
+            player.score += score;
             socket.emit('select', true);
         } else {
+            player.score += 0;
             socket.emit('select', false);
         }
 
-        console.log("ONE " + lobby.ready_players);
-        console.log("two " + lobby.players.length);
+        // console.log("ONE " + lobby.ready_players);
+        // console.log("two " + lobby.players.length);
         if (lobby.ready_players === lobby.players.length) {
-            lobby.ready_players = 0;
-            lobby.current_round++;
-
-            clearInterval(lobby.interval);
-
-            io.in(player.lobby_code).emit('show_results', lobby.current_round);
-
-            setTimeout(function () {
-                game_timer(lobby, socket);
-            }, 5000);
+            initiate_next_round(lobby, player, socket);
         }
     });
 
@@ -105,41 +99,49 @@ io.on('connection', socket => {
         game_timer(lobby, socket);
     })
 
-    function game_timer(lobby, socket) {
-        let seconds = 0;
-        let player = get_player(socket.id);
-        let music_info = choose_random_song(lobby.players);
 
-        //Base case
-        if (lobby.current_round === lobby.max_rounds) {
-            io.in(player.lobby_code).emit('end_game', '')
-            return;
-        }
-
-        io.in(player.lobby_code).emit('new_round', music_info, lobby.players);
-
-
-        let interval = setInterval(function () {
-            console.log(seconds);
-            seconds++;
-            if (seconds === 30) {
-                lobby.current_round++;
-
-                clearInterval(lobby.interval);
-                io.in(player.lobby_code).emit('show_results', lobby.current_round);
-
-                setTimeout(function () {
-                    game_timer(lobby, socket);
-                }, 5000);
-            }
-        }, 1000);
-
-        lobby.interval = interval;
-        lobby.music_info = music_info;
-    }
 })
 
+function game_timer(lobby, socket) {
+    let seconds = 0;
+    let player = get_player(socket.id);
+    let music_info = choose_random_song(lobby.players);
 
+    //Base case
+    if (lobby.current_round === lobby.max_rounds) {
+        io.in(player.lobby_code).emit('end_game', '')
+        return;
+    }
+
+    io.in(player.lobby_code).emit('new_round', music_info, lobby.players);
+
+    let interval = setInterval(function () {
+        console.log(seconds);
+        lobby.time_elapsed = seconds;
+        seconds++;
+        if (seconds === lobby.max_time) {
+            initiate_next_round(lobby, player, socket);
+        }
+    }, 1000);
+
+    lobby.interval = interval;
+    lobby.music_info = music_info;
+}
+
+function initiate_next_round(lobby, player, socket) {
+    sort_players(lobby);
+    lobby.ready_players = 0;
+    lobby.current_round++;
+
+    clearInterval(lobby.interval);
+    lobby.time_elapsed = 0;
+
+    io.in(player.lobby_code).emit('show_results', lobby);
+
+    setTimeout(function () {
+        game_timer(lobby, socket);
+    }, 5000);
+}
 
 function choose_random_song(current_players) {
     let random_player_index = Math.floor(Math.random() * current_players.length);

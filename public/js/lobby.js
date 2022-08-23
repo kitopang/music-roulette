@@ -6,7 +6,7 @@ function new_lobby(code, player) {
     if (existing_lobby) {
         existing_lobby.players.push(player);
     } else {
-        const lobby = { code, info: undefined, interval: undefined, players: [], ready_players: 0, current_round: 0, max_rounds: 15, music_info: undefined };
+        const lobby = { code, info: undefined, interval: undefined, players: [], ready_players: 0, current_round: 0, max_rounds: 15, music_info: undefined, time_elapsed: 0, max_time: 30 };
         lobby.players.push(player);
         lobbies.push(lobby);
     }
@@ -16,22 +16,32 @@ function get_lobby(code) {
     return lobbies.find(lobby => lobby.code === code);
 }
 
-function update_lobby_info(lobby, lobby_info, interval) {
-    lobby.info = lobby_info;
-    lobby.interval = interval;
+function lobby_leave(lobby, player) {
+    const index = lobby.players.findIndex(player);
+    console.log(index);
+
+    if (index !== -1) {
+        lobby.players.splice(index, 1);
+    }
 }
 
-function increment_ready_players(lobby) {
-    lobby.ready_players++;
+function sort_players(lobby) {
+    console.log("sorting");
+    lobby.players = lobby.players.sort(comparator);
 }
 
-function reset_ready_players(lobby) {
-    lobby.ready_players = 0;
+function comparator(a, b) {
+    if (a.score < b.score) {
+        return 1;
+    }
+    if (a.score > b.score) {
+        return -1;
+    }
+
+    return 0;
 }
 
-function populate_lobby(lobby) {
-    return lobby.players;
-}
+
 
 
 
@@ -39,8 +49,6 @@ function populate_lobby(lobby) {
 module.exports = {
     new_lobby,
     get_lobby,
-    update_lobby_info,
-    increment_ready_players,
-    reset_ready_players,
-    populate_lobby
+    lobby_leave,
+    sort_players
 };
