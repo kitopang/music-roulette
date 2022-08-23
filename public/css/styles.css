@@ -8,8 +8,13 @@
     transition: .5s;
 }
 
-#round {
+#round_num {
     opacity: 100;
+
+}
+
+#round {
+    opacity: 0;
     transition: opacity .5s;
 }
 
@@ -26,6 +31,11 @@
     -webkit-transition: background-color 500ms linear;
     -ms-transition: background-color 500ms linear;
     transition: background-color 500ms linear;
+}
+
+#end_buttons {
+    opacity: 0;
+    transition: opacity .5s;
 }
 
 #join_game {

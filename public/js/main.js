@@ -13,6 +13,7 @@ const myAudio = document.createElement('audio');
 const score_div = document.querySelector('#score');
 const round_num = document.querySelector('#round_num');
 const scoreboard = document.querySelector('#scoreboard');
+const end_buttons = document.querySelector('#end_buttons');
 
 let song_url;
 let chosen_player;
@@ -54,6 +55,7 @@ socket.on('initialize_lobby', players => {
 socket.on('startgame', start => {
     if (start === 'true') {
         lobby_div.style.opacity = '0';
+        end_buttons.style.opacity = '0';
 
         setTimeout(function () {
             lobby_div.classList.add('d-none');
@@ -63,8 +65,9 @@ socket.on('startgame', start => {
     console.log(start)
 })
 
-socket.on('new_round', (music_data, player_data) => {
-    render_next_round(music_data, player_data);
+
+socket.on('new_round', (music_data, player_data, first_round) => {
+    render_next_round(music_data, player_data, first_round);
 });
 
 socket.on('select', (correct) => {
@@ -90,7 +93,8 @@ socket.on('show_results', lobby => {
 })
 
 socket.on('end_game', lobby => {
-    show_leaderboard(lobby);
+    end_buttons.classList.remove('d-none');
+    end_buttons.style.opacity = '100';
 });
 
 function add_player_to_lobby(player) {
@@ -142,19 +146,20 @@ function show_leaderboard(lobby, end_game) {
     }
 
     setTimeout(function () {
-        round_div.style.opacity = 0;
+        round_div.style.opacity = '0';
         setTimeout(function () {
             round_div.classList.add('d-none');
             score_div.classList.remove('d-none');
-            score_div.style.opacity = 100;
+            score_div.style.opacity = '1';
             setTimeout(function () {
             }, 1000);
         }, 1000);
     }, 1000);
 }
 
-function render_next_round(music_data, player_data) {
+function render_next_round(music_data, player_data, first_round) {
     round_div.classList.add('d-none');
+
 
     while (player_choices_div.firstChild) {
         player_choices_div.removeChild(player_choices_div.firstChild);
@@ -164,25 +169,42 @@ function render_next_round(music_data, player_data) {
     populate_players(player_data);
     set_random_song(music_data);
 
-    setTimeout(function () {
-        score_div.style.opacity = 0;
+
+    if (first_round) {
         setTimeout(function () {
-            score_div.classList.add('d-none');
             round_number_div.classList.remove('d-none');
-            round_number_div.style.opacity = '100';
+            round_number_div.style.opacity = '1';
             setTimeout(function () {
                 round_number_div.style.opacity = '0';
                 setTimeout(function () {
                     round_number_div.classList.add('d-none');
                     round_div.classList.remove('d-none');
-
                     setTimeout(function () {
-                        round_div.style.opacity = '100';
+                        round_div.style.opacity = '1';
                     }, 500)
                 }, 500)
+            }, 500);
+        }, 800)
+    } else {
+        setTimeout(function () {
+            score_div.style.opacity = 0;
+            setTimeout(function () {
+                score_div.classList.add('d-none');
+                round_number_div.classList.remove('d-none');
+                round_number_div.style.opacity = '1';
+                setTimeout(function () {
+                    round_number_div.style.opacity = '0';
+                    setTimeout(function () {
+                        round_number_div.classList.add('d-none');
+                        round_div.classList.remove('d-none');
+                        setTimeout(function () {
+                            round_div.style.opacity = '1';
+                        }, 500)
+                    }, 500)
+                }, 1000);
             }, 1000);
         }, 1000);
-    }, 1000);
+    }
 }
 
 function populate_players(player_data) {

@@ -31,15 +31,13 @@ io.on('connection', socket => {
     var socketId = socket.id;
     var clientIp = socket.request.connection.remoteAddress;
 
-
     console.log("connected!");
-
 
     socket.on('join_lobby', (code) => {
         const spotify_item = get_spotify(clientIp);
         const player = player_join(socket.id, spotify_item.username, code, spotify_item.topTracks, 0, undefined);
 
-        new_lobby(code, player);
+        new_lobby(code, player, 1);
 
         socket.join(player.lobby_code)
         console.log(player.username);
@@ -59,12 +57,12 @@ io.on('connection', socket => {
         if (player) {
             let lobby = get_lobby(player.lobby_code);
 
+
             socket.to(player.lobby_code).emit('disconnect_player', player);
             socket.leave(player.lobby_code);
+            lobby_leave(lobby, player)
             player_leave(socket.id);
-            lobby_leave(player, lobby)
         }
-
     });
 
     socket.on('ready', (username) => {
@@ -107,14 +105,15 @@ function game_timer(lobby, socket) {
     let seconds = 0;
     let player = get_player(socket.id);
     let music_info = choose_random_song(lobby.players);
+    let first_round = lobby.current_round === 0;
 
     //Base case
-    if (lobby.current_round === 2) {
+    if (lobby.current_round === lobby.max_rounds) {
         io.in(player.lobby_code).emit('end_game', lobby)
         return;
     }
 
-    io.in(player.lobby_code).emit('new_round', music_info, lobby.players);
+    io.in(player.lobby_code).emit('new_round', music_info, lobby.players, first_round);
 
     let interval = setInterval(function () {
         console.log(seconds);
