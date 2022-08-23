@@ -1,4 +1,5 @@
 const start_game_button = document.querySelector("#start_button");
+const start_game_button2 = document.querySelector("#start_button2")
 const lobby_div = document.querySelector('#lobby');
 const round_number_div = document.querySelector('#round_number');
 const round_div = document.querySelector('#round');
@@ -103,7 +104,7 @@ function add_player_to_lobby(player) {
     entry.classList.add('bg-transparent');
     entry.classList.add('border');
     entry.classList.add('border-light');
-    entry.classList.add('text-light', 'p-3', 'fw-bold', 'h5');
+    entry.classList.add('text-light', 'p-3', 'fw-bold', 'h5', 'm-0');
     entry.innerText = player.username;
 
     joined_players_div.appendChild(entry);
@@ -179,6 +180,7 @@ function render_next_round(music_data, player_data, first_round) {
                 setTimeout(function () {
                     round_number_div.classList.add('d-none');
                     round_div.classList.remove('d-none');
+                    round_div.classList.add('d-flex')
                     setTimeout(function () {
                         round_div.style.opacity = '1';
                     }, 500)
@@ -220,7 +222,7 @@ function populate_players(player_data) {
             current_row.classList.add('row', 'mt-3');
 
             let entry = document.createElement("div");
-            entry.classList.add('border', 'border-light', 'col', 'p-4', 'mx-4', 'text-center')
+            entry.classList.add('border', 'border-light', 'col', 'p-4', 'm-2', 'text-center')
             entry.setAttribute('id', 'player_card')
             entry.setAttribute('value', 'false');
             let text = document.createElement("h4");
@@ -232,7 +234,7 @@ function populate_players(player_data) {
             entry.append(text);
         } else {
             let entry = document.createElement("div");
-            entry.classList.add('bg-transparent', 'border', 'border-light', 'col', 'p-4', 'mx-4', 'text-center')
+            entry.classList.add('bg-transparent', 'border', 'border-light', 'col', 'p-4', 'm-2', 'text-center')
             entry.setAttribute('id', 'player_card');
             entry.setAttribute('value', 'false');
             let text = document.createElement("h4");
@@ -306,4 +308,7 @@ start_game_button.addEventListener("click", () => {
     console.log("emits");
 });
 
+start_game_button2.addEventListener("click", () => {
+    socket.emit('startgame', 'true');
+});
 

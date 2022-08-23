@@ -23,18 +23,23 @@
 
         <div class="" id="lobby">
             <div class="justify-content-center mx-auto align-items-center d-flex">
-                <ul class="list-group list-group-flush bg-transparent col-7" id="joined_players_list">
+                <ul class="list-group list-group-flush bg-transparent col-md-7 col-10" id="">
                     <li
                         class="p-2 fw-bold text-center list-group-item bg-primary border border-light text-light rounded-top">
                         ---
                         Joined
                         Players ---
                     </li>
+
+                    <div id="joined_players_list">
+
+                    </div>
                 </ul>
             </div>
             <div class="d-flex justify-content-center">
-                <div class="justify-content-between d-flex col-7 mt-3">
-                    <button type="button" class="btn btn-outline-light fw-bold" id="">&lt; Leave</button>
+                <div class="justify-content-between d-flex col-md-7 col-10 mt-3">
+                    <button type="button" class="btn btn-outline-light fw-bold" id="" onclick="history.back()">&lt;
+                        Leave</button>
                     <button type="button" class="btn btn-outline-light fw-bold" id="start_button">Start Game
                         &gt;</button>
                 </div>
@@ -55,20 +60,20 @@
                     <h2 class="text-light fw-bold" id="song_title">Song title</h2>
                     <h3 class="text-light fw-bold fst-italic" id="song_artist">Artist</h3>
                 </div>
-                <div class="col d-flex align-items-center justify-content-center">
+                <div class="col d-md-flex d-none align-items-center justify-content-center">
                     <button id="play_button" type="button" class="btn btn-outline-light btn-circle btn-sm"
                         value="false">▷</button>
                 </div>
             </div>
 
-            <div id="player_choices" class="row mt-1 col-7">
+            <div id="player_choices" class="row mt-1 col-md-7 col-11">
 
             </div>
         </div>
 
         <div class="" id="score">
             <div class="justify-content-center mx-auto align-items-center d-flex">
-                <ul class="list-group list-group-flush bg-transparent col-7" id="">
+                <ul class="list-group list-group-flush bg-transparent col-md-7 col-10" id="">
                     <li
                         class="p-2 fw-bold text-center list-group-item bg-primary border border-light text-light rounded-top">
                         ---
@@ -84,9 +89,10 @@
                 </ul>
             </div>
             <div class="d-flex justify-content-center d-none" id="end_buttons">
-                <div class="justify-content-between d-flex col-7 mt-3">
-                    <button type="button" class="btn btn-outline-light fw-bold" id="">&lt; Leave</button>
-                    <button type="button" class="btn btn-outline-light fw-bold" id="start_button">Play Again
+                <div class="justify-content-between d-flex col-md-7 col-10 mt-3">
+                    <button type="button" class="btn btn-outline-light fw-bold" id="" onclick="history.back()">&lt;
+                        Leave</button>
+                    <button type="button" class="btn btn-outline-light fw-bold d-none" id="start_button2">Play Again
                         &gt;</button>
                 </div>
             </div>
