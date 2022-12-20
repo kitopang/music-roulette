@@ -2,7 +2,7 @@
 
 Analogous to the popular mobile game photo roulette, music roulette allows multiple players to guess each other's top songs through a linked Spotify account. Players can create a randomized lobby or join an existing lobby, then begin guessing who the randomly chosen song belongs to through 15 rounds. Points are awarded to players based on their accuracy and speed.   
 
-This app utilizes the popular Node.JS javascript runtime, Express Node.JS web framework, socket.io for asynchronous player connections, spotify-web-api-node library for spotify handling, and Bootstrap v5.2 for frontend. Every part of this web application was designed from scratch and extensively incorporates both frontend and backend web development. 
+This app utilizes the Node.JS javascript runtime, Express Node.JS web framework, socket.io for asynchronous player connections, spotify-web-api-node library for spotify handling, and Bootstrap v5.2 for frontend. Designed completely from scratch, this application fully incorporates fullstack web development. 
 
 More images and gameplay footage coming soon!
 
